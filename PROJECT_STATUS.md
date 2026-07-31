@@ -19,8 +19,9 @@
 
 - 项目远程仓库：`https://github.com/aqiu-919/xinsbirthday`。
 - 公开网站：`https://aqiu-919.github.io/xinsbirthday/`。
-- 完整项目以 GitHub 仓库 `main` 分支为跨设备权威副本，本地目录仅作为可重建工作区。
-- GitHub Pages 由 `.github/workflows/pages.yml` 自动发布 `site/`；推送到 `main` 后自动刷新网站。
+- 完整项目以 GitHub Release 最新备份包为跨设备权威副本，本地目录仅作为可重建工作区。
+- GitHub 仓库 `main` 分支保存维护入口、部署配置和 `site-deploy.zip`；Release 保存完整源资料备份。
+- GitHub Pages 由 `.github/workflows/pages.yml` 解压并自动发布网站部署包；推送到 `main` 后自动刷新网站。
 - 资料库更新仍必须先运行 `node refresh_project.mjs`，确保工作簿与 `site/data/archive.json` 同步后再推送。
 - 精选时间轴独立更新后必须运行 `node verify_timeline.mjs`，验证通过后再推送。
 

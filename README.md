@@ -72,8 +72,9 @@ python -m http.server 8000
 
 - GitHub 仓库：`https://github.com/aqiu-919/xinsbirthday`
 - 公开网站：`https://aqiu-919.github.io/xinsbirthday/`
-- `main` 分支保存完整项目源文件、资料来源、现役工作簿、网站和验证用例。
-- `.github/workflows/pages.yml` 在每次推送到 `main` 后验证精选时间轴，并将 `site/` 作为网站根目录自动发布。
+- `main` 分支保存维护脚本、项目规则、状态文档及网站部署包 `site-deploy.zip`。
+- GitHub Release 附件 `xinsbirthday-project-backup-2026-07-31.zip` 保存完整项目源文件、资料来源、现役工作簿、网站和验证用例。
+- `.github/workflows/pages.yml` 在每次推送到 `main` 后解压网站部署包、验证精选时间轴，并将解压后的 `site/` 作为网站根目录自动发布。
 - GitHub Pages 只展示 `site/`，仓库中的生成脚本、原始资料和工作簿不会出现在网站页面中。
 
 资料库内容更新后，先运行完整刷新并确认通过，再提交和推送：
@@ -99,12 +100,13 @@ git push
 ## 更换电脑后恢复
 
 1. 安装 Git、Node.js、Python 和 Codex。
-2. 克隆仓库：`git clone https://github.com/aqiu-919/xinsbirthday.git`。
-3. 用 Codex 打开克隆后的 `xinsbirthday` 文件夹；项目规则以仓库中的 `AGENTS.md` 为准。
-4. 本项目的表格生成依赖 `@oai/artifact-tool`。在 Codex 工作区运行时使用其兼容运行时；如果普通 Node 环境缺少该包，应先在支持该依赖的 Codex 环境中执行完整刷新。
-5. 运行 `node verify_timeline.mjs`；需要更新资料库时再运行 `node refresh_project.mjs`。
+2. 从仓库 Releases 下载最新的完整项目备份包并解压。
+3. 用 Codex 打开解压后的项目文件夹；项目规则以其中的 `AGENTS.md` 为准。
+4. 如需核对线上部署配置，再克隆仓库：`git clone https://github.com/aqiu-919/xinsbirthday.git`。
+5. 本项目的表格生成依赖 `@oai/artifact-tool`。在 Codex 工作区运行时使用其兼容运行时；如果普通 Node 环境缺少该包，应先在支持该依赖的 Codex 环境中执行完整刷新。
+6. 运行 `node verify_timeline.mjs`；需要更新资料库时再运行 `node refresh_project.mjs`。
 
-`node_modules/`、`.tools/`、缓存和检查日志不进入仓库，它们不是项目权威资料，也不影响在新电脑上恢复。
+`node_modules/`、`.tools/`、`.git/`、缓存和检查日志不进入完整备份包，它们不是项目权威资料，也不影响在新电脑上恢复。
 
 ## 验证标准
 
