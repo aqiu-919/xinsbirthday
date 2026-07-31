@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b18">
+  <title>欢迎光临望栎星</title>
+  <link rel="stylesheet" href="styles.css?v=20260731-11">
+</head>
+<body>
+  <canvas id="starfield" aria-hidden="true"></canvas>
+  <div class="nebula" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#start" aria-label="返回望栎星球起点">
+      <span class="brand-mark">✦</span>
+      <span>望栎星球</span>
+    </a>
+    <div class="progress-wrap" aria-label="时间线进度">
+      <span id="progressYear">2007</span>
+      <div id="progressTrack" class="progress-track" role="slider" tabindex="0" aria-label="拖动时间轴进度" aria-valuemin="2007" aria-valuemax="2026" aria-valuenow="2007"><i id="progressFill"></i></div>
+      <span>2026</span>
+    </div>
+    <nav class="tools" aria-label="时间线工具">
+      <button id="startBtn" class="icon-btn" title="返回起点" aria-label="返回起点">↤</button>
+      <button id="yearsBtn" class="icon-btn" title="年份导航" aria-label="打开年份导航"><span class="magnifier-icon" aria-hidden="true"></span></button>
+      <button id="endBtn" class="icon-btn" title="前往终点" aria-label="前往终点">↦</button>
+      <button id="soundBtn" class="icon-btn" title="开启星空音效" aria-label="开启星空音效">♪</button>
+    </nav>
+  </header>
+
+  <main id="journey" tabindex="0">
+    <section id="start" class="hero scene">
+      <div class="hero-copy">
+        <h1>欢迎光临望栎星</h1>
+        <p class="lead">如果你抬头找到一个星作伴，<br>我会闪烁，我会存在。</p>
+        <button id="beginBtn" class="primary-btn star-btn"><span>由此启程</span></button>
+      </div>
+      <div class="orbit" aria-hidden="true"><span></span><i></i></div>
+      <p class="scroll-cue">滚动探索时间轨迹</p>
+    </section>
+
+    <section id="timeline" class="timeline" aria-label="王栎鑫活动时间线">
+      <div id="track" class="track"></div>
+      <button id="traveler" class="traveler" aria-label="点击小光人开始或暂停旅程" title="点击开始旅程">
+        <img class="light-person person-child" src="assets/light-people/light-person-2007.png" alt="">
+        <img class="light-person person-youth" src="assets/light-people/light-person-2016.png" alt="">
+        <img class="light-person person-adult" src="assets/light-people/light-person-2016.png" alt="">
+        <div class="stardust"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="traveler-glow"></div>
+        <span id="travelerStatus">点击启程</span>
+      </button>
+    </section>
+
+    <section id="postTimeline" class="post-timeline scene" aria-label="账号与履历">
+    <section id="accounts" class="accounts" aria-labelledby="accountsTitle">
+      <div class="accounts-inner">
+        <header class="accounts-head">
+          <p class="eyebrow">与他相遇的地方</p>
+          <h2 id="accountsTitle">你好呀~王小鑫</h2>
+        </header>
+
+        <div class="account-rows">
+          <section class="account-row" aria-labelledby="accountSelfTitle">
+            <h3 id="accountSelfTitle">王栎鑫本人</h3>
+            <div class="account-grid account-grid-three">
+              <a class="account-preview" href="assets/account-previews/dy.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="assets/account-previews/dy.jpg" alt="王栎鑫抖音账号预览">
+              </a>
+              <a class="account-preview" href="assets/account-previews/wb.png" target="_blank" rel="noopener noreferrer">
+                <img src="assets/account-previews/wb.png" alt="王栎鑫微博账号预览">
+              </a>
+              <a class="account-preview" href="https://www.xiaohongshu.com/user/profile/5eb6827e0000000001004f51?xsec_token=ABctOXlbYf0mJj-nF4BbnkTohMZJU6bCZYfB4wISS2OLc%3D&amp;xsec_source=pc_search" target="_blank" rel="noopener noreferrer">
+                <img src="assets/account-previews/xhs-self.png" alt="王栎鑫小红书账号预览">
+              </a>
+            </div>
+          </section>
+
+          <section class="account-row" aria-labelledby="accountStudioTitle">
+            <h3 id="accountStudioTitle">工作室</h3>
+            <div class="account-grid account-grid-three">
+              <a class="account-preview" href="assets/account-previews/dy2.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="assets/account-previews/dy2.jpg" alt="王栎鑫工作室抖音账号预览">
+              </a>
+              <a class="account-preview" href="assets/account-previews/wb2.png" target="_blank" rel="noopener noreferrer">
+                <img src="assets/account-previews/wb2.png" alt="王栎鑫工作室微博账号预览">
+              </a>
+              <a class="account-preview" href="https://www.xiaohongshu.com/user/profile/5ec3a82600000000010018d5?xsec_token=ABYEI_Qu5HDkkh-Wl423lPRpBISjpUReMbM8cr9Te2GtY%3D&amp;xsec_source=pc_search" target="_blank" rel="noopener noreferrer">
+                <img src="assets/account-previews/xhs-studio.png" alt="王栎鑫工作室小红书账号预览">
+              </a>
+            </div>
+          </section>
+
+          <section class="account-row" aria-labelledby="accountOtherTitle">
+            <h3 id="accountOtherTitle">其他</h3>
+            <div class="account-grid account-grid-four">
+              <a class="account-preview" href="assets/account-previews/tb.png" target="_blank" rel="noopener noreferrer">
+                <img src="assets/account-previews/tb.png" alt="旺福福天猫账号预览">
+              </a>
+              <a class="account-preview" href="assets/account-previews/wb3.png" target="_blank" rel="noopener noreferrer">
+                <img src="assets/account-previews/wb3.png" alt="旺福福的好朋屋微博账号预览">
+              </a>
+              <a class="account-preview" href="assets/account-previews/wb4.png" target="_blank" rel="noopener noreferrer">
+                <img src="assets/account-previews/wb4.png" alt="王栎鑫全球栎迷会微博账号预览">
+              </a>
+              <a class="account-preview" href="https://www.xiaohongshu.com/user/profile/69bb9492000000003202f47f?xsec_token=ABeJav78AlXJmb5w_YUi2eTN4uC9c7uym0GbZg5JvphGk%3D&amp;xsec_source=pc_search" target="_blank" rel="noopener noreferrer">
+                <img src="assets/account-previews/xhs-other.png" alt="旺福福的好朋屋小红书账号预览">
+              </a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section id="archive" class="archive">
+      <div class="archive-head">
+        <p class="eyebrow">抵达此刻</p>
+        <h2>王小鑫的成长轨迹</h2>
+        <p>作品与活动合并按年份与日期排列，每一季、每一站和每一次活动均独立展示。</p>
+      </div>
+      <div class="archive-controls">
+        <div id="filters" class="filters" role="tablist" aria-label="履历分类"></div>
+        <label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="搜索作品或活动" aria-label="搜索作品或活动"></label>
+      </div>
+      <div id="archiveGrid" class="archive-grid"></div>
+      <p id="emptyState" class="empty" hidden>这片星域暂时没有匹配的记录。</p>
+    </section>
+    </section>
+  </main>
+
+  <dialog id="eventDialog" class="event-dialog">
+    <button id="closeDialog" class="dialog-close" aria-label="关闭">×</button>
+    <p id="dialogMeta" class="dialog-meta"></p>
+    <h2 id="dialogTitle"></h2>
+    <p id="dialogRole" class="dialog-role"></p>
+    <p id="dialogNote" class="dialog-note"></p>
+    <a id="dialogLink" class="source-link" target="_blank" rel="noopener noreferrer">查看资料来源 ↗</a>
+  </dialog>
+
+  <section id="specialScene" class="special-scene" aria-hidden="true">
+    <canvas id="specialCanvas" aria-hidden="true"></canvas>
+    <div class="special-material" aria-hidden="true"><span>✦</span></div>
+    <div class="special-copy">
+      <p id="specialMeta" class="eyebrow"></p>
+      <h2 id="specialTitle"></h2>
+      <p id="specialNote"></p>
+      <button id="specialContinue" class="primary-btn">继续前行 →</button>
+    </div>
+  </section>
+
+  <section id="endScene" class="end-scene" aria-hidden="true">
+    <div class="end-scene-copy">
+      <p>
+        <span>十九年如白驹过隙</span>
+        <span>不知道屏幕前的你是在什么时候看到了王栎鑫的名字</span>
+        <span>又是什么时候开始生活中有了王栎鑫的痕迹呢</span>
+        <span>或早或晚 都不必感到遗憾</span>
+        <span class="end-scene-last-line">只是  再陪伴阿糊更久一点吧</span>
+      </p>
+    </div>
+  </section>
+
+  <div id="yearPanel" class="year-panel" aria-hidden="true">
+    <div class="year-panel-head"><strong>选择年份</strong><button id="closeYears" aria-label="关闭年份导航">×</button></div>
+    <div id="yearList" class="year-list"></div>
+  </div>
+  <div id="portalTransition" class="portal-transition" aria-hidden="true">
+    <i></i><span></span>
+  </div>
+  <div id="flash" class="flash" aria-hidden="true"></div>
+  <script src="app.js?v=20260731-11"></script>
+</body>
+</html>
