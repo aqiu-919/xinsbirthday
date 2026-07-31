@@ -24,9 +24,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract website package
-        run: unzip -q site-deploy.zip -d site
-
       - name: Verify timeline data
         run: node verify_timeline.mjs
 
