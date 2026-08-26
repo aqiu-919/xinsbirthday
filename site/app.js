@@ -398,6 +398,7 @@ function queueJourneyTransition(callback, delay) {
 }
 
 function beginJourney() {
+  if (!state.audio && !state.audioPlayed) toggleSound();
   resetEndSequence();
   clearJourneyTransition();
   stopWalking();
