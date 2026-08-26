@@ -4,6 +4,7 @@ const state = {
   currentFilter: "全部",
   visited: new Set(JSON.parse(localStorage.getItem("wangli-visited") || "[]")),
   audio: null,
+  audioPlayed: false,
   walking: false,
   walkFrame: 0,
   lastWalkTime: 0,
@@ -31,6 +32,7 @@ const postTimeline = el("postTimeline");
 const accounts = el("accounts");
 const archive = el("archive");
 const categories = ["全部", "影视", "音乐", "舞台", "综艺", "杂志", "其他"];
+const WALK_SPEED = 58;
 
 function isDesktopLayout() {
   return window.innerWidth > 760;
@@ -557,7 +559,7 @@ function walkStep(timestamp) {
   const viewportSize = desktop ? innerWidth : innerHeight;
   const travelerRatio = desktop ? .5 : .48;
   const focusPosition = position + viewportSize * travelerRatio;
-  const nextPosition = position + 72.5 * delta / 1000;
+  const nextPosition = position + WALK_SPEED * delta / 1000;
   const nextFocusPosition = nextPosition + viewportSize * travelerRatio;
   const special = findCrossedSpecial(focusPosition, nextFocusPosition, desktop);
   if (special) {
@@ -693,40 +695,33 @@ function toggleYears() {
 
 function toggleSound() {
   if (state.audio) {
-    state.audio.ctx.close();
-    state.audio = null;
-    el("soundBtn").classList.remove("active");
+    if (state.audio.paused && !state.audio.ended) {
+      state.audio.play().catch(() => {});
+      el("soundBtn").classList.add("active");
+    } else if (!state.audio.paused) {
+      state.audio.pause();
+      el("soundBtn").classList.remove("active");
+    }
     return;
   }
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const gain = ctx.createGain();
-  gain.gain.value = .025;
-  gain.connect(ctx.destination);
-  const oscillators = [174.61, 261.63, 392].map((frequency, i) => {
-    const osc = ctx.createOscillator();
-    const localGain = ctx.createGain();
-    osc.type = i === 0 ? "sine" : "triangle";
-    osc.frequency.value = frequency;
-    localGain.gain.value = i === 0 ? .5 : .13;
-    osc.connect(localGain).connect(gain);
-    osc.start();
-    return osc;
+  if (state.audioPlayed) return;
+  const audio = new Audio("assets/bgm-i-love-you.mp3");
+  audio.preload = "auto";
+  audio.addEventListener("ended", () => {
+    el("soundBtn").classList.remove("active");
+    el("soundBtn").setAttribute("aria-label", "背景音乐已播放完毕");
+  }, { once: true });
+  state.audio = audio;
+  state.audioPlayed = true;
+  audio.play().catch(() => {
+    state.audioPlayed = false;
+    state.audio = null;
   });
-  state.audio = { ctx, gain, oscillators };
   el("soundBtn").classList.add("active");
 }
 
 function playChime() {
-  if (!state.audio) return;
-  const { ctx, gain } = state.audio;
-  const osc = ctx.createOscillator();
-  const chimeGain = ctx.createGain();
-  osc.frequency.value = 659.25;
-  chimeGain.gain.setValueAtTime(.12, ctx.currentTime);
-  chimeGain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .8);
-  osc.connect(chimeGain).connect(gain);
-  osc.start();
-  osc.stop(ctx.currentTime + .8);
+  // 特殊节点不再叠加额外音效，避免与 BGM 争用音频通道。
 }
 
 function initStars() {
