@@ -590,21 +590,34 @@ body { overflow-x: hidden; overflow-y: auto; }
 
 @media (max-width: 760px) {
   .timeline { height: 8200px; }
-  .track { top: 100px; bottom: calc(52svh + 40px); left: 23%; width: 92px; }
-  .piano-key { width: 88px; transform: translate(calc(-50% + var(--key-x) * .28), -50%) rotate(calc(var(--key-angle) * .45)); }
-  .event-node { left: calc(23% + var(--path-x) * .28) !important; }
-  .event-node .node-copy, .event-node:nth-child(even) .node-copy, .event-node:nth-child(odd) .node-copy { left: 42px; right: auto; text-align: center; width: min(69vw, 300px); }
-  .node-date { font-size: 17px; }
-  .node-title { font-size: 13px; }
-  .node-title.is-long { font-size: 11px; }
-  .node-title.is-very-long { font-size: 9px; }
-  .node-intro { font-size: 14px; line-height: 1.65; }
+  .track { top: 100px; bottom: calc(52svh + 40px); left: 50%; width: 108px; transform: translateX(-50%); }
+  .piano-key { width: 104px; transform: translate(calc(-50% + var(--key-x) * .18), -50%) rotate(calc(var(--key-angle) * .28)); }
+  .event-node { left: calc(50% + var(--path-x) * .18) !important; }
+  .event-node .node-copy,
+  .event-node:nth-child(even) .node-copy,
+  .event-node:nth-child(odd) .node-copy {
+    left: 50%;
+    right: auto;
+    width: min(88vw, 390px);
+    padding: 7px 12px 8px;
+    border: 1px solid rgba(142, 217, 230, .2);
+    border-radius: 6px;
+    background: rgba(3, 10, 28, .64);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .2);
+    text-align: center;
+    transform: translate(-50%, -50%);
+  }
+  .node-date { font-size: clamp(18px, 5.8vw, 24px); line-height: 1.05; color: #ffe28a; text-shadow: 0 1px 5px rgba(0,0,0,.65); }
+  .node-title { font-size: clamp(13px, 3.8vw, 17px); line-height: 1.4; color: #fffdf5; white-space: normal; overflow: visible; text-shadow: 0 1px 5px rgba(0,0,0,.8); }
+  .node-title.is-long { font-size: clamp(12px, 3.4vw, 15px); }
+  .node-title.is-very-long { font-size: clamp(11px, 3.1vw, 14px); }
+  .node-intro { margin-top: 6px; font-size: clamp(12px, 3.3vw, 15px); line-height: 1.5; color: #c9f3ff; text-shadow: 0 1px 5px rgba(0,0,0,.75); }
   .event-dialog { width: calc(100vw - 24px); padding: 34px 18px 22px; }
   .dialog-heading { padding: 0 20px; }
   .event-dialog h2 { font-size: clamp(20px, 6vw, 28px); }
   .dialog-intro { font-size: 17px; line-height: 1.8; }
   .image-dialog { padding: 28px 12px 12px; }
-  .traveler { left: 23%; top: 48%; }
+  .traveler { left: 50%; top: 48%; }
   .special-material { width: 88vw; }
   .special-copy h2 { font-size: 36px; }
   .end-scene-copy { width: calc(100vw - 36px); }
