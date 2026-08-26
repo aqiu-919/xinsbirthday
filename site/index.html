@@ -130,11 +130,22 @@
 
   <dialog id="eventDialog" class="event-dialog">
     <button id="closeDialog" class="dialog-close" aria-label="关闭">×</button>
-    <p id="dialogMeta" class="dialog-meta"></p>
-    <h2 id="dialogTitle"></h2>
-    <p id="dialogRole" class="dialog-role"></p>
-    <p id="dialogNote" class="dialog-note"></p>
-    <a id="dialogLink" class="source-link" target="_blank" rel="noopener noreferrer">查看资料来源 ↗</a>
+    <header class="dialog-heading">
+      <time id="dialogDate" class="dialog-date"></time>
+      <h2 id="dialogTitle"></h2>
+    </header>
+    <p id="dialogIntro" class="dialog-intro"></p>
+    <figure id="dialogMedia" class="dialog-media" hidden>
+      <button id="dialogImageButton" class="dialog-image-button" type="button" aria-label="放大查看图片">
+        <img id="dialogImage" alt="">
+      </button>
+    </figure>
+    <div id="dialogSources" class="dialog-sources"></div>
+  </dialog>
+
+  <dialog id="imageDialog" class="image-dialog">
+    <button id="closeImageDialog" class="dialog-close" aria-label="关闭大图">×</button>
+    <img id="dialogImageLarge" alt="">
   </dialog>
 
   <section id="specialScene" class="special-scene" aria-hidden="true">
@@ -168,6 +179,6 @@
     <i></i><span></span>
   </div>
   <div id="flash" class="flash" aria-hidden="true"></div>
-  <script src="app.js?v=20260731-11"></script>
+  <script src="app.js?v=20260826-1"></script>
 </body>
 </html>

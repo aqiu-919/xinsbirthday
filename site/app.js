@@ -19,6 +19,8 @@ const state = {
   timelineMetrics: null,
   lastProgressIndex: -1,
   lastProgressRatio: -1,
+  dialogOpenTimer: 0,
+  dialogAutoCloseTimer: 0,
 };
 
 const el = (id) => document.getElementById(id);
@@ -91,35 +93,62 @@ function renderTimeline() {
     const pathX = Math.sin(ratio * Math.PI * 4.2) * 24 + Math.sin(ratio * Math.PI * 1.6) * 8;
     node.style.setProperty("--path-x", `${pathX}px`);
     if (isSpecialEvent(event)) node.classList.add("special-node");
+    const nodeTitle = String(event["活动/事件名称"] || "").replace(/\s+/g, " ").trim();
+    const titleSizeClass = nodeTitle.length > 24 ? " is-very-long" : nodeTitle.length > 16 ? " is-long" : "";
     node.innerHTML = `
       <button class="node-button" aria-label="查看${escapeHtml(event["活动/事件名称"])}"></button>
       <div class="node-copy">
-        <span class="node-year">${event["年份"]}</span>
-        <span class="node-title">${escapeHtml(event["活动/事件名称"])}</span>
-        <span class="node-type">${escapeHtml(event["类别"])}</span>
+        <time class="node-date" datetime="${escapeHtml(event["日期精度"])}">${escapeHtml(event["日期精度"])}</time>
+        <strong class="node-title${titleSizeClass}">${escapeHtml(nodeTitle)}</strong>
+        ${event["文字介绍"] ? `<p class="node-intro">${escapeHtml(event["文字介绍"])}</p>` : ""}
       </div>`;
     node.querySelector("button").addEventListener("click", () => openEvent(event, node));
     track.appendChild(node);
   });
 }
 
-function openEvent(event, node) {
-  state.resumeAfterDialog = state.walking;
+function openEvent(event, node, { auto = false } = {}) {
+  clearTimeout(state.dialogOpenTimer);
+  clearTimeout(state.dialogAutoCloseTimer);
+  state.resumeAfterDialog = auto || state.walking;
   stopWalking();
   state.visited.add(event["活动ID"]);
   localStorage.setItem("wangli-visited", JSON.stringify([...state.visited]));
   node.classList.add("visited");
-  el("dialogMeta").textContent = `${event["日期精度"]} · ${event["类别"]}${event["地点"] ? ` · ${event["地点"]}` : ""}`;
+  el("dialogDate").textContent = event["日期精度"];
+  el("dialogDate").dateTime = event["日期精度"];
   el("dialogTitle").textContent = event["活动/事件名称"];
-  el("dialogRole").textContent = [event["身份"], event["平台/主办"]].filter(Boolean).join(" · ");
-  el("dialogNote").textContent = event["备注"] || "这一刻已经被收进星光轨迹。";
-  const link = el("dialogLink");
-  link.href = event["来源URL"] || "#";
-  link.hidden = !event["来源URL"];
+  el("dialogIntro").textContent = event["文字介绍"] || "";
+  el("dialogIntro").hidden = !event["文字介绍"];
+  const media = el("dialogMedia");
+  const image = el("dialogImage");
+  if (event["素材展示"]) {
+    image.src = event["素材展示"];
+    image.alt = `${String(event["活动/事件名称"]).replace(/\s+/g, " ")}相关图片`;
+    media.hidden = false;
+  } else {
+    image.removeAttribute("src");
+    image.alt = "";
+    media.hidden = true;
+  }
+  const sourceUrls = String(event["来源URL"] || "").split(/\s+/).filter(Boolean);
+  el("dialogSources").innerHTML = sourceUrls.map((url, index) =>
+    `<a class="source-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${sourceUrls.length > 1 ? `资料来源 ${index + 1}` : "查看资料来源"} ↗</a>`
+  ).join("");
+  el("dialogSources").hidden = sourceUrls.length === 0;
+  el("eventDialog").classList.toggle("special-event-dialog", isSpecialEvent(event));
   el("flash").classList.remove("active");
   void el("flash").offsetWidth;
   el("flash").classList.add("active");
-  setTimeout(() => el("eventDialog").showModal(), 260);
+  state.dialogOpenTimer = setTimeout(() => {
+    if (!el("eventDialog").open) el("eventDialog").showModal();
+    if (auto) {
+      state.dialogAutoCloseTimer = setTimeout(() => {
+        if (el("imageDialog").open) el("imageDialog").close();
+        if (el("eventDialog").open) el("eventDialog").close();
+      }, 7000);
+    }
+  }, 260);
   playChime();
 }
 
@@ -245,9 +274,20 @@ function bindEvents() {
   el("closeDialog").addEventListener("click", () => el("eventDialog").close());
   el("eventDialog").addEventListener("click", (event) => { if (event.target === el("eventDialog")) el("eventDialog").close(); });
   el("eventDialog").addEventListener("close", () => {
+    clearTimeout(state.dialogOpenTimer);
+    clearTimeout(state.dialogAutoCloseTimer);
     if (state.resumeAfterDialog) startWalking();
     state.resumeAfterDialog = false;
   });
+  el("dialogImageButton").addEventListener("click", () => {
+    const source = el("dialogImage");
+    if (!source.src) return;
+    el("dialogImageLarge").src = source.src;
+    el("dialogImageLarge").alt = source.alt;
+    el("imageDialog").showModal();
+  });
+  el("closeImageDialog").addEventListener("click", () => el("imageDialog").close());
+  el("imageDialog").addEventListener("click", (event) => { if (event.target === el("imageDialog")) el("imageDialog").close(); });
   el("soundBtn").addEventListener("click", toggleSound);
   traveler.addEventListener("click", toggleWalking);
   el("specialContinue").addEventListener("click", closeSpecialScene);
@@ -432,7 +472,9 @@ function updateProgress() {
   const postContentActive = desktop
     ? position >= postTimeline.offsetLeft - viewportSize * .5
     : postTimeline.getBoundingClientRect().top < viewportSize * .5;
+  const wasPostContentActive = document.body.classList.contains("post-content-active");
   document.body.classList.toggle("post-content-active", postContentActive);
+  if (wasPostContentActive && !postContentActive) document.dispatchEvent(new Event("stars-resume"));
   const ratio = Math.max(0, Math.min(1, (position - start) / length));
   const index = Math.min(state.events.length - 1, Math.round(ratio * (state.events.length - 1)));
   if (Math.abs(ratio - state.lastProgressRatio) > .002) {
@@ -465,11 +507,8 @@ function updateProgress() {
   }
 }
 
-const specialEventIds = new Set(["E001", "E004", "E011", "E016", "E028", "E029", "E041", "E049", "E157", "E162"]);
-
 function isSpecialEvent(event) {
-  const index = state.events.indexOf(event);
-  return index > 0 && index < state.events.length - 1 && specialEventIds.has(event["活动ID"]);
+  return event["是否是特殊节点"] === "是";
 }
 
 function toggleWalking() {
@@ -529,7 +568,7 @@ function walkStep(timestamp) {
     scrollJourneyTo(targetPosition, "auto");
     state.reachedSpecials.add(special.event["活动ID"]);
     stopWalking();
-    setTimeout(() => showSpecialScene(special.event), 180);
+    setTimeout(() => openEvent(special.event, special.node.closest(".event-node"), { auto: true }), 180);
     return;
   }
   const lastNode = track.querySelector(".event-node:last-of-type");
@@ -630,11 +669,7 @@ function drawSpecialEffect() {
     size: .5 + Math.random() * 2,
   }));
   const draw = (time = 0) => {
-    if (document.hidden || document.body.classList.contains("post-content-active")) {
-      lastStarDrawTime = time;
-      requestAnimationFrame(draw);
-      return;
-    }
+    if (document.hidden || document.body.classList.contains("post-content-active")) return;
     context.clearRect(0, 0, innerWidth, innerHeight);
     particles.forEach((particle) => {
       const angle = particle.angle + time * particle.speed;
@@ -893,6 +928,10 @@ function initStars() {
   };
   resize();
   draw();
+  document.addEventListener("stars-resume", () => requestAnimationFrame(draw), { passive: true });
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && !document.body.classList.contains("post-content-active")) requestAnimationFrame(draw);
+  }, { passive: true });
   window.addEventListener("resize", resize);
 }
 
