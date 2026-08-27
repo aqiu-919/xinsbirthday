@@ -5,6 +5,7 @@ const state = {
   visited: new Set(JSON.parse(localStorage.getItem("wangli-visited") || "[]")),
   audio: null,
   audioPlayed: false,
+  audioPlayCount: 0,
   walking: false,
   walkFrame: 0,
   lastWalkTime: 0,
@@ -440,6 +441,9 @@ function queueJourneyTransition(callback, delay) {
 
 function beginJourney() {
   if (!state.audio && !state.audioPlayed) toggleSound();
+  const desktop = isDesktopLayout();
+  const revealDelay = desktop ? 520 : 900;
+  const completeDelay = desktop ? 1080 : 1880;
   resetEndSequence();
   clearJourneyTransition();
   stopWalking();
@@ -453,7 +457,7 @@ function beginJourney() {
     traveler.style.opacity = "1";
     document.body.classList.add("timeline-launched", "timeline-active", "portal-transition-reveal");
     updateProgress();
-  }, 900);
+  }, revealDelay);
   state.beginJourneyTimer = queueJourneyTransition(() => {
     traveler.dataset.era = "1";
     traveler.classList.add("journey-ready");
@@ -463,7 +467,7 @@ function beginJourney() {
     document.body.classList.remove("journey-transitioning", "portal-transition-active", "portal-transition-warp", "portal-transition-reveal");
     state.transitioningJourney = false;
     startWalking();
-  }, 1880);
+  }, completeDelay);
 }
 
 function scrollToPosition(position) {
@@ -758,14 +762,22 @@ function toggleSound() {
   const audio = new Audio("assets/bgm-i-love-you.mp3");
   audio.preload = "auto";
   audio.addEventListener("ended", () => {
+    if (state.audioPlayCount < 2) {
+      state.audioPlayCount += 1;
+      audio.currentTime = 0;
+      audio.play().catch(() => el("soundBtn").classList.remove("active"));
+      return;
+    }
     el("soundBtn").classList.remove("active");
-    el("soundBtn").setAttribute("aria-label", "背景音乐已播放完毕");
-  }, { once: true });
+    el("soundBtn").setAttribute("aria-label", "背景音乐已播放两遍");
+  });
   state.audio = audio;
   state.audioPlayed = true;
+  state.audioPlayCount = 1;
   audio.play().catch(() => {
     state.audioPlayed = false;
     state.audio = null;
+    state.audioPlayCount = 0;
   });
   el("soundBtn").classList.add("active");
 }
