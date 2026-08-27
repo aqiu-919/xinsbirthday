@@ -84,7 +84,7 @@ async function init() {
     fetch("data/archive.json"),
   ]);
   state.events = await timelineResponse.json();
-  state.eraThreeStartRatio = getDateBoundaryRatio("2025/01/18");
+  state.eraThreeStartRatio = getDateBoundaryRatio("2015/01/18");
   state.archiveEvents = await archiveResponse.json();
   renderTimeline();
   renderFilters();
