@@ -604,7 +604,7 @@ body { overflow-x: hidden; overflow-y: auto; }
 
 @media (max-width: 760px) {
   .timeline { height: 8200px; }
-  .track { top: 100px; bottom: calc(52svh + 40px); left: 50%; width: 108px; transform: translateX(-50%); }
+  .track { top: 100px; bottom: var(--mobile-track-bottom, calc(52svh + 40px)); left: 50%; width: 108px; transform: translateX(-50%); }
   .piano-key { width: 104px; transform: translate(calc(-50% + var(--key-x) * .18), -50%) rotate(calc(var(--key-angle) * .28)); }
   .event-node { left: calc(50% + var(--path-x) * .18) !important; }
   .event-node .node-copy,

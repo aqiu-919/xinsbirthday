@@ -22,6 +22,7 @@ const state = {
   lastProgressRatio: -1,
   dialogOpenTimer: 0,
   dialogAutoCloseTimer: 0,
+  travelerPointerPosition: null,
 };
 
 const el = (id) => document.getElementById(id);
@@ -107,6 +108,42 @@ function renderTimeline() {
     node.querySelector("button").addEventListener("click", () => openEvent(event, node));
     track.appendChild(node);
   });
+  layoutMobileTimeline();
+  document.fonts?.ready.then(layoutMobileTimeline);
+}
+
+function layoutMobileTimeline() {
+  const timeline = el("timeline");
+  if (isDesktopLayout()) {
+    timeline.style.removeProperty("height");
+    timeline.style.removeProperty("--mobile-track-bottom");
+    state.timelineMetrics = null;
+    return;
+  }
+
+  const nodes = [...track.querySelectorAll(".event-node")];
+  const trackTop = 100;
+  const copyOffset = 30;
+  const unitGap = 56;
+  const nextButtonRadius = 12;
+  const trackTail = 48;
+  const bottomPadding = Math.max(window.innerHeight * .52 + 40, 480);
+  let nodeY = trackTop + 28;
+  let lastUnitBottom = nodeY;
+
+  nodes.forEach((node) => {
+    const copy = node.querySelector(".node-copy");
+    node.style.setProperty("--timeline-y", `${nodeY}px`);
+    const copyHeight = Math.ceil(copy?.getBoundingClientRect().height || 0);
+    lastUnitBottom = nodeY + copyOffset + copyHeight;
+    nodeY = lastUnitBottom + unitGap + nextButtonRadius;
+  });
+
+  const trackEnd = lastUnitBottom + trackTail;
+  timeline.style.height = `${Math.ceil(trackTop + trackEnd + bottomPadding)}px`;
+  timeline.style.setProperty("--mobile-track-bottom", `${bottomPadding}px`);
+  state.timelineMetrics = null;
+  scheduleProgressUpdate();
 }
 
 function openEvent(event, node, { auto = false } = {}) {
@@ -291,6 +328,10 @@ function bindEvents() {
   el("closeImageDialog").addEventListener("click", () => el("imageDialog").close());
   el("imageDialog").addEventListener("click", (event) => { if (event.target === el("imageDialog")) el("imageDialog").close(); });
   el("soundBtn").addEventListener("click", toggleSound);
+  traveler.addEventListener("pointerdown", (event) => {
+    state.travelerPointerPosition = getJourneyPosition();
+    event.preventDefault();
+  });
   traveler.addEventListener("click", toggleWalking);
   el("specialContinue").addEventListener("click", closeSpecialScene);
   el("endScene").addEventListener("click", () => {
@@ -303,7 +344,7 @@ function bindEvents() {
   el("progressTrack").addEventListener("keydown", handleProgressKey);
   window.addEventListener("resize", () => {
     state.timelineMetrics = null;
-    scheduleProgressUpdate();
+    requestAnimationFrame(layoutMobileTimeline);
   });
 }
 
@@ -514,15 +555,21 @@ function isSpecialEvent(event) {
   return event["是否是特殊节点"] === "是";
 }
 
-function toggleWalking() {
+function toggleWalking(event) {
+  event?.preventDefault();
   if (state.walking) {
+    const pausedPosition = state.travelerPointerPosition ?? getJourneyPosition();
+    state.travelerPointerPosition = null;
     stopWalking();
+    scrollJourneyTo(pausedPosition, "auto");
+    requestAnimationFrame(() => scrollJourneyTo(pausedPosition, "auto"));
     return;
   }
+  state.travelerPointerPosition = null;
   const desktop = window.innerWidth > 760;
   const position = getJourneyPosition();
   const timelineStart = desktop ? el("timeline").offsetLeft : el("timeline").offsetTop;
-  const postStart = desktop ? postTimeline.offsetLeft : archive.offsetTop;
+  const postStart = desktop ? postTimeline.offsetLeft : postTimeline.offsetTop;
   const viewportSize = desktop ? innerWidth : innerHeight;
   if (position < timelineStart - viewportSize * .6 || position >= postStart - viewportSize * .4) {
     jumpToTimeline(0);
@@ -545,6 +592,8 @@ function startWalking() {
 function stopWalking() {
   state.walking = false;
   cancelAnimationFrame(state.walkFrame);
+  state.walkFrame = 0;
+  state.lastWalkTime = 0;
   traveler.classList.remove("walking");
   if (el("travelerStatus")) el("travelerStatus").textContent = "点击继续";
   traveler.setAttribute("aria-label", "继续小光人的旅程");
