@@ -293,6 +293,9 @@ function bindEvents() {
   journey.addEventListener("scroll", scheduleProgressUpdate, { passive: true });
   postTimeline.addEventListener("scroll", scheduleProgressUpdate, { passive: true });
   el("beginBtn").addEventListener("click", beginJourney);
+  el("beginBtn").addEventListener("pointerdown", () => {
+    if (!state.audio && !state.audioPlayed) toggleSound();
+  }, { passive: true });
   el("startBtn").addEventListener("click", () => { resetEndSequence(); clearJourneyTransition(); scrollToPosition(0); });
   el("endBtn").addEventListener("click", () => { resetEndSequence(); stopWalking(); scrollToPostTimelineStart(); });
   el("yearsBtn").addEventListener("click", toggleYears);
@@ -759,8 +762,9 @@ function toggleSound() {
     return;
   }
   if (state.audioPlayed) return;
-  const audio = new Audio("assets/bgm-i-love-you.mp3");
-  audio.preload = "auto";
+  const audio = el("bgmAudio") || new Audio("assets/bgm-i-love-you.mp3");
+  audio.preload = "metadata";
+  audio.setAttribute("playsinline", "");
   audio.addEventListener("ended", () => {
     if (state.audioPlayCount < 2) {
       state.audioPlayCount += 1;
