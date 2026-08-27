@@ -24,6 +24,7 @@ const state = {
   dialogOpenTimer: 0,
   dialogAutoCloseTimer: 0,
   travelerPointerPosition: null,
+  eraThreeStartRatio: 1,
 };
 
 const el = (id) => document.getElementById(id);
@@ -42,6 +43,26 @@ function isDesktopLayout() {
 
 function getJourneyPosition() {
   return isDesktopLayout() ? window.scrollX : window.scrollY;
+}
+
+function timelineDateValue(value) {
+  const match = String(value || "").match(/^(\d{4})[\/-](\d{1,2})(?:[\/-](\d{1,2}))?$/);
+  if (!match) return null;
+  return Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3] || 1));
+}
+
+function getDateBoundaryRatio(targetDate) {
+  const target = timelineDateValue(targetDate);
+  if (target == null || state.events.length < 2) return 1;
+  const dated = state.events.map((event, index) => ({
+    value: timelineDateValue(event["日期精度"]),
+    ratio: index / (state.events.length - 1),
+  })).filter((item) => item.value != null).sort((a, b) => a.value - b.value);
+  const next = dated.find((item) => item.value >= target);
+  const previous = [...dated].reverse().find((item) => item.value <= target);
+  if (!previous) return next?.ratio ?? 1;
+  if (!next || next.value === previous.value) return previous.ratio;
+  return previous.ratio + (next.ratio - previous.ratio) * ((target - previous.value) / (next.value - previous.value));
 }
 
 function scrollJourneyTo(position, behavior = "auto") {
@@ -63,6 +84,7 @@ async function init() {
     fetch("data/archive.json"),
   ]);
   state.events = await timelineResponse.json();
+  state.eraThreeStartRatio = getDateBoundaryRatio("2025/01/18");
   state.archiveEvents = await archiveResponse.json();
   renderTimeline();
   renderFilters();
@@ -535,7 +557,7 @@ function updateProgress() {
   el("progressYear").textContent = state.events[index]?.["年份"] || "2007";
   el("progressTrack").setAttribute("aria-valuenow", state.events[index]?.["年份"] || "2007");
   const year = Number(state.events[index]?.["年份"] || 2007);
-  const era = year >= 2021 ? 3 : year >= 2016 ? 2 : 1;
+  const era = ratio >= state.eraThreeStartRatio ? 3 : year >= 2016 ? 2 : 1;
   const previousEra = Number(traveler.dataset.era || era);
   traveler.dataset.era = era;
   if (previousEra !== era) {
