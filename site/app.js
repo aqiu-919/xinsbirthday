@@ -99,9 +99,9 @@ async function init() {
 function renderTimeline() {
   const pianoKeys = Array.from({ length: 142 }, (_, index) => {
     const ratio = index / 141;
-    const x = Math.sin(ratio * Math.PI * 4.2) * 24 + Math.sin(ratio * Math.PI * 1.6) * 8;
+    const x = Math.sin(ratio * Math.PI * 4.2) * 36 + Math.sin(ratio * Math.PI * 1.6) * 12;
     const nextRatio = Math.min(1, (index + 1) / 141);
-    const nextX = Math.sin(nextRatio * Math.PI * 4.2) * 24 + Math.sin(nextRatio * Math.PI * 1.6) * 8;
+    const nextX = Math.sin(nextRatio * Math.PI * 4.2) * 36 + Math.sin(nextRatio * Math.PI * 1.6) * 12;
     const angle = Math.atan2(nextX - x, 72) * -180 / Math.PI;
     const hasBlack = [1, 3, 6, 8, 10].includes(index % 12);
     return `<i class="piano-key${hasBlack ? " has-black" : ""}" style="--key-y:${ratio * 100}%;--key-x:${x}px;--key-angle:${angle}deg"></i>`;
@@ -116,7 +116,7 @@ function renderTimeline() {
     const trackPadding = window.innerWidth <= 760 ? window.innerHeight * .52 + 40 : 280;
     node.style.setProperty("--timeline-y", `${ratio * (el("timeline").offsetHeight - trackPadding)}px`);
     node.style.setProperty("--timeline-x", `${ratio * 100}%`);
-    const pathX = Math.sin(ratio * Math.PI * 4.2) * 24 + Math.sin(ratio * Math.PI * 1.6) * 8;
+    const pathX = Math.sin(ratio * Math.PI * 4.2) * 36 + Math.sin(ratio * Math.PI * 1.6) * 12;
     node.style.setProperty("--path-x", `${pathX}px`);
     if (isSpecialEvent(event)) node.classList.add("special-node");
     const nodeTitle = String(event["活动/事件名称"] || "").replace(/\s+/g, " ").trim();
