@@ -16,7 +16,7 @@ body {
   overflow: hidden;
   font-family: "Microsoft YaHei UI", "PingFang SC", sans-serif;
   background:
-    radial-gradient(ellipse at 82% 10%, rgba(255, 205, 72, .76), transparent 42%),
+    radial-gradient(ellipse at 84% 8%, rgba(255, 224, 82, .99), transparent 55%),
     radial-gradient(ellipse at 22% 82%, rgba(27, 101, 239, .7), transparent 48%),
     radial-gradient(ellipse at 55% 112%, rgba(14, 77, 210, .54), transparent 42%),
     linear-gradient(135deg, #06113b 0%, #0d3fa5 48%, #061442 100%);
@@ -41,7 +41,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   pointer-events: none;
   overflow: hidden;
   background:
-    radial-gradient(ellipse at 78% 12%, rgba(255, 207, 75, .68), transparent 38%),
+    radial-gradient(ellipse at 82% 10%, rgba(255, 226, 88, .98), transparent 52%),
     radial-gradient(ellipse at 44% 50%, rgba(29, 117, 255, .46), transparent 42%),
     radial-gradient(ellipse at 22% 86%, rgba(18, 80, 220, .62), transparent 38%),
     radial-gradient(ellipse at 82% 72%, rgba(18, 75, 186, .4), transparent 42%),
@@ -170,7 +170,9 @@ h1 { margin: 0; font: 400 clamp(58px, 7.2vw, 112px)/1.05 Georgia, "STSong", seri
 .orbit::before { inset: 6%; border: 2px dashed rgba(255,220,120,.48); filter: drop-shadow(0 0 7px rgba(241,199,91,.34)); }
 .orbit::after { inset: 18%; border: 2px solid rgba(255,224,130,.58); box-shadow: 0 0 32px rgba(241,199,91,.2); }
 .orbit span { position: absolute; top: 49%; left: -13px; width: 26px; height: 26px; border-radius: 50%; background: #ffe27a; box-shadow: 0 0 12px #fff1a8, 0 0 38px var(--gold), 0 0 72px rgba(241,199,91,.78); }
-.scroll-cue { position: absolute; bottom: 28px; font-size: 11px; color: var(--muted); }
+.scroll-cue { position: absolute; left: 50%; bottom: 22px; display: grid; justify-items: center; gap: 7px; transform: translateX(-50%); font-size: 11px; color: rgba(220,226,235,.58); white-space: nowrap; }
+.scroll-arrow { position: relative; display: block; width: 17px; height: 17px; border-right: 1px solid rgba(220,226,235,.58); border-bottom: 1px solid rgba(220,226,235,.58); transform: rotate(45deg) translate(-3px, -3px); animation: scroll-arrow-bob 1.8s ease-in-out infinite; opacity: .72; }
+@keyframes scroll-arrow-bob { 0%, 100% { opacity: .38; transform: rotate(45deg) translate(-5px, -5px); } 50% { opacity: .82; transform: rotate(45deg) translate(0, 0); } }
 .timeline { width: max(10600px, 700vw); height: 100vh; flex: none; position: relative; }
 .track { position: absolute; left: 140px; right: 140px; top: 54%; height: 150px; transform: translateY(-50%); }
 .track::before { content: ""; position: absolute; inset: 0 -150px; background: rgba(15,170,255,.1); filter: blur(34px); }
@@ -293,6 +295,11 @@ body.post-content-active .topbar { backdrop-filter: none; background: rgba(8,11,
   object-fit: contain;
   filter: drop-shadow(0 10px 14px rgba(0,0,0,.24));
 }
+.accounts-scroll-cue { display: flex; justify-content: center; gap: 42px; height: 58px; margin-top: 4px; opacity: .42; pointer-events: none; }
+.accounts-scroll-cue i { display: block; width: 20px; height: 20px; border-right: 2px solid rgba(255, 231, 163, .72); border-bottom: 2px solid rgba(255, 231, 163, .72); transform: rotate(45deg) translate(-5px, -5px); animation: accounts-arrow-bob 1.9s ease-in-out infinite; }
+.accounts-scroll-cue i:nth-child(2) { animation-delay: .18s; }
+.accounts-scroll-cue i:nth-child(3) { animation-delay: .36s; }
+@keyframes accounts-arrow-bob { 0%, 100% { opacity: .32; transform: rotate(45deg) translate(-7px, -7px); } 50% { opacity: 1; transform: rotate(45deg) translate(0, 0); } }
 .archive { padding: 104px 6vw 60px; overflow-y: auto; background: linear-gradient(90deg, rgba(8,11,24,.2), rgba(8,11,24,.92) 10%); }
 .archive-head { max-width: 720px; }
 .archive h2 { margin: 0 0 12px; font: 400 52px/1.1 Georgia, "STSong", serif; }
@@ -650,7 +657,8 @@ body { overflow-x: hidden; overflow-y: auto; }
 @media (max-width: 760px) {
   .timeline { height: 8200px; }
   .track { top: 100px; bottom: var(--mobile-track-bottom, calc(52svh + 40px)); left: 50%; width: 108px; transform: translateX(-50%); }
-  .piano-key { width: 104px; transform: translate(calc(-50% + var(--key-x) * .18), -50%) rotate(calc(var(--key-angle) * .28)); }
+  .piano-path { inset: 0 8vw; border-radius: 50% / 3.5%; transform: perspective(700px) rotateY(-5deg); }
+  .piano-key { width: clamp(82px, 26vw, 108px); transform: translate(calc(-50% + var(--key-x) * .9), -50%) rotate(calc(var(--key-angle) * .55)); }
   .event-node { left: calc(50% + var(--path-x) * .18) !important; }
   .event-node .node-copy,
   .event-node:nth-child(even) .node-copy,

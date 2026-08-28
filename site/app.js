@@ -678,8 +678,8 @@ function showEndScene() {
   scene.classList.add("active");
   scene.setAttribute("aria-hidden", "false");
   state.endSceneTimers.push(setTimeout(() => scene.classList.add("copy-visible"), 500));
-  state.endSceneTimers.push(setTimeout(() => scene.classList.add("skippable"), 10500));
-  state.endSceneTimers.push(setTimeout(closeEndScene, 20500));
+  scene.classList.add("skippable");
+  state.endSceneTimers.push(setTimeout(closeEndScene, 7000));
 }
 
 function closeEndScene() {
