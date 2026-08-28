@@ -868,11 +868,11 @@ function initStars() {
         warm: .36,
       },
     ];
-    stars = Array.from({ length: Math.min(190, Math.floor(area / 7800)) }, () => {
+    stars = Array.from({ length: Math.min(wide ? 145 : 90, Math.floor(area / (wide ? 9800 : 6200))) }, () => {
       const isLi = Math.random() < .055;
       return { x: Math.random() * innerWidth, y: Math.random() * innerHeight, r: Math.random() * 1.25 + .2, a: Math.random(), s: Math.random() * .008 + .002, isLi, size: Math.random() * 22 + 24, rotation: (Math.random() - .5) * .34 };
     });
-    streamParticles = Array.from({ length: Math.min(wide ? 360 : 240, Math.floor(area / (wide ? 4200 : 2900))) }, () => {
+    streamParticles = Array.from({ length: Math.min(wide ? 250 : 150, Math.floor(area / (wide ? 5600 : 3900))) }, () => {
       const streamIndex = Math.floor(Math.random() * streamDefs.length);
       const stream = streamDefs[streamIndex];
       return {
