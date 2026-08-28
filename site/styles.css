@@ -170,9 +170,7 @@ h1 { margin: 0; font: 400 clamp(58px, 7.2vw, 112px)/1.05 Georgia, "STSong", seri
 .orbit::before { inset: 6%; border: 2px dashed rgba(255,220,120,.48); filter: drop-shadow(0 0 7px rgba(241,199,91,.34)); }
 .orbit::after { inset: 18%; border: 2px solid rgba(255,224,130,.58); box-shadow: 0 0 32px rgba(241,199,91,.2); }
 .orbit span { position: absolute; top: 49%; left: -13px; width: 26px; height: 26px; border-radius: 50%; background: #ffe27a; box-shadow: 0 0 12px #fff1a8, 0 0 38px var(--gold), 0 0 72px rgba(241,199,91,.78); }
-.scroll-cue { position: absolute; left: 50%; bottom: 22px; display: grid; justify-items: center; gap: 7px; transform: translateX(-50%); font-size: 11px; color: rgba(220,226,235,.58); white-space: nowrap; }
-.scroll-arrow { position: relative; display: block; width: 17px; height: 17px; border-right: 1px solid rgba(220,226,235,.58); border-bottom: 1px solid rgba(220,226,235,.58); transform: rotate(45deg) translate(-3px, -3px); animation: scroll-arrow-bob 1.8s ease-in-out infinite; opacity: .72; }
-@keyframes scroll-arrow-bob { 0%, 100% { opacity: .38; transform: rotate(45deg) translate(-5px, -5px); } 50% { opacity: .82; transform: rotate(45deg) translate(0, 0); } }
+.scroll-cue { position: absolute; bottom: 28px; font-size: 11px; color: var(--muted); }
 .timeline { width: max(10600px, 700vw); height: 100vh; flex: none; position: relative; }
 .track { position: absolute; left: 140px; right: 140px; top: 54%; height: 150px; transform: translateY(-50%); }
 .track::before { content: ""; position: absolute; inset: 0 -150px; background: rgba(15,170,255,.1); filter: blur(34px); }
