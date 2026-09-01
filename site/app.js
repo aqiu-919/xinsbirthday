@@ -6,6 +6,7 @@ const state = {
   audio: null,
   audioPlayed: false,
   audioPlayCount: 0,
+  audioFadeHandler: null,
   walking: false,
   walkFrame: 0,
   lastWalkTime: 0,
@@ -110,7 +111,7 @@ function renderTimeline() {
   state.events.forEach((event, index) => {
     const ratio = index / (state.events.length - 1);
     const node = document.createElement("article");
-    node.className = `event-node${state.visited.has(event["活动ID"]) ? " visited" : ""}`;
+    node.className = `event-node${state.visited.has(event["活动ID"]) ? " visited" : ""}${event["活动ID"] === "T029" ? " compact-intro-node" : ""}`;
     node.dataset.id = event["活动ID"];
     node.dataset.index = index;
     const trackPadding = window.innerWidth <= 760 ? window.innerHeight * .52 + 40 : 280;
@@ -787,13 +788,29 @@ function toggleSound() {
   const audio = el("bgmAudio") || new Audio("assets/bgm-i-love-you.mp3");
   audio.preload = "metadata";
   audio.setAttribute("playsinline", "");
+  const fadeSeconds = 4;
+  const secondIntroFadeSeconds = 1.5;
+  state.audioFadeHandler = () => {
+    if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+    const remaining = audio.duration - audio.currentTime;
+    if (remaining <= fadeSeconds) {
+      audio.volume = Math.max(0, Math.min(1, remaining / fadeSeconds));
+    } else if (state.audioPlayCount === 2 && audio.currentTime < secondIntroFadeSeconds) {
+      audio.volume = Math.max(0, Math.min(1, audio.currentTime / secondIntroFadeSeconds));
+    } else {
+      audio.volume = 1;
+    }
+  };
+  audio.addEventListener("timeupdate", state.audioFadeHandler);
   audio.addEventListener("ended", () => {
     if (state.audioPlayCount < 2) {
       state.audioPlayCount += 1;
+      audio.volume = 0;
       audio.currentTime = 0;
       audio.play().catch(() => el("soundBtn").classList.remove("active"));
       return;
     }
+    audio.volume = 1;
     el("soundBtn").classList.remove("active");
     el("soundBtn").setAttribute("aria-label", "背景音乐已播放两遍");
   });
