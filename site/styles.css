@@ -298,10 +298,10 @@ body.post-content-active .topbar { backdrop-filter: none; background: rgba(8,11,
   filter: drop-shadow(0 10px 14px rgba(0,0,0,.24));
 }
 .accounts-scroll-cue { display: flex; justify-content: center; gap: 42px; height: 58px; margin-top: 4px; opacity: .42; pointer-events: none; }
-.accounts-scroll-cue i { display: block; width: 20px; height: 20px; border-right: 2px solid rgba(255, 231, 163, .72); border-bottom: 2px solid rgba(255, 231, 163, .72); transform: rotate(45deg) translate(-5px, -5px); animation: accounts-arrow-bob 1.9s ease-in-out infinite; }
+.accounts-scroll-cue i { display: block; width: 42px; height: 58px; background: url("assets/scroll-hand.png") center / contain no-repeat; filter: invert(1); transform: translateY(-5px); animation: accounts-arrow-bob 1.9s ease-in-out infinite; }
 .accounts-scroll-cue i:nth-child(2) { animation-delay: .18s; }
 .accounts-scroll-cue i:nth-child(3) { animation-delay: .36s; }
-@keyframes accounts-arrow-bob { 0%, 100% { opacity: .32; transform: rotate(45deg) translate(-7px, -7px); } 50% { opacity: 1; transform: rotate(45deg) translate(0, 0); } }
+@keyframes accounts-arrow-bob { 0%, 100% { opacity: .24; transform: translateY(-8px); } 50% { opacity: .58; transform: translateY(0); } }
 .archive { padding: 104px 6vw 60px; overflow-y: auto; background: linear-gradient(90deg, rgba(8,11,24,.2), rgba(8,11,24,.92) 10%); }
 .archive-head { max-width: 720px; }
 .archive h2 { margin: 0 0 12px; font: 400 52px/1.1 Georgia, "STSong", serif; }
