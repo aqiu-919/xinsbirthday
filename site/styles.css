@@ -257,7 +257,7 @@ body.post-content-active .topbar { backdrop-filter: none; background: rgba(8,11,
 .accounts-inner { width: min(1540px, 100%); height: auto; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 28px; }
 .accounts-head { text-align: center; }
 .accounts-head .eyebrow { margin-bottom: 10px; }
-.accounts h2 { margin: 0; font: 400 48px/1.1 Georgia, "STSong", serif; text-shadow: 0 0 32px rgba(241,199,91,.2); }
+.accounts h2 { margin: 0; font: 400 48px/1.1 "STKaiti", "KaiTi", "FZKai-Z03", cursive; text-shadow: 0 0 32px rgba(241,199,91,.2); }
 .account-rows { min-height: 0; display: grid; gap: 26px; }
 .account-row { min-height: 0; display: block; padding: 0; border: 0; }
 .account-row h3 { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
@@ -305,11 +305,13 @@ body.post-content-active .topbar { backdrop-filter: none; background: rgba(8,11,
 @keyframes accounts-arrow-bob { 0%, 100% { opacity: .24; transform: translateY(-8px); } 50% { opacity: .58; transform: translateY(0); } }
 .archive { padding: 104px 6vw 60px; overflow-y: auto; background: linear-gradient(90deg, rgba(8,11,24,.2), rgba(8,11,24,.92) 10%); }
 .archive-head { max-width: 720px; }
-.archive h2 { margin: 0 0 12px; font: 400 52px/1.1 Georgia, "STSong", serif; }
+.archive h2 { margin: 0 0 12px; font: 400 52px/1.1 "STKaiti", "KaiTi", "FZKai-Z03", cursive; }
 .archive-head > p:last-child { color: var(--muted); }
 .archive-intro { max-width: 860px; color: var(--muted); font-size: 14px; line-height: 1.8; }
 .archive-intro p { margin: 0 0 8px; }
 .archive-intro p:last-child { margin-bottom: 0; }
+.archive-source { overflow-wrap: anywhere; }
+.archive-source a { color: var(--gold-soft); text-decoration-color: rgba(255,233,153,.55); text-underline-offset: 3px; }
 .archive-controls { position: sticky; top: -1px; z-index: 3; display: flex; justify-content: space-between; gap: 18px; align-items: center; padding: 26px 0 18px; background: linear-gradient(to bottom, rgba(8,11,24,.98) 76%, transparent); }
 .filters { display: flex; gap: 8px; flex-wrap: wrap; }
 .filter-btn { border: 1px solid rgba(255,255,255,.13); color: var(--muted); background: rgba(255,255,255,.03); padding: 9px 15px; cursor: pointer; }
