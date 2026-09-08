@@ -6,7 +6,15 @@ const sourcePath = "sources/feishu/公开活动合集.json";
 const archivePath = "site/data/archive.json";
 const timelinePath = "site/data/timeline.json";
 
-const archive = JSON.parse(await fs.readFile(sourcePath, "utf8"));
+const source = JSON.parse(await fs.readFile(sourcePath, "utf8"));
+const archive = source.map((item) => ({
+  ...item,
+  "活动/事件名称": item["活动/事件名称"] || item["活动事件名称"] || "",
+  活动事件名称: undefined,
+}));
+for (const item of archive) {
+  delete item.活动事件名称;
+}
 await fs.mkdir("site/data", { recursive: true });
 await fs.writeFile(archivePath, JSON.stringify(archive, null, 2), "utf8");
 const timeline = JSON.parse(await fs.readFile(timelinePath, "utf8"));

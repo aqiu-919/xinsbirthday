@@ -79,6 +79,10 @@ function classify(event) {
   return categories.includes(category) && category !== "全部" ? category : "其他";
 }
 
+function activityName(event) {
+  return String(event["活动/事件名称"] || event["活动事件名称"] || "").trim();
+}
+
 async function init() {
   const [timelineResponse, archiveResponse] = await Promise.all([
     fetch("data/timeline.json"),
@@ -287,7 +291,7 @@ function compareArchiveEvents(a, b) {
   return dateA.month - dateB.month
     || dateA.day - dateB.day
     || String(a["类别"]).localeCompare(String(b["类别"]), "zh-CN")
-    || String(a["活动/事件名称"]).localeCompare(String(b["活动/事件名称"]), "zh-CN");
+    || activityName(a).localeCompare(activityName(b), "zh-CN");
 }
 
 function formatArchiveDateToken(value) {
@@ -311,7 +315,7 @@ function formatArchiveDate(event) {
 }
 
 function renderArchiveEvent(event) {
-  const title = escapeHtml(event["活动/事件名称"]);
+  const title = escapeHtml(activityName(event));
   const sourceUrl = String(event["来源URL"] || "").split(/\s+/).filter(Boolean)[0] || "";
   return `<article class="archive-row">
     <time class="archive-date" datetime="${escapeHtml(event["日期精度"] || event["年份"])}">${formatArchiveDate(event)}</time>
