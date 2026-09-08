@@ -253,6 +253,7 @@ body.timeline-active .piano-key.has-black::after { box-shadow: -3px 3px 5px rgba
   background: rgba(4, 8, 20, .58);
 }
 body.post-content-active #starfield { display: none; }
+body.post-content-active .nebula { display: none; }
 body.post-content-active .topbar { backdrop-filter: none; background: rgba(8,11,24,.9); }
 .accounts-inner { width: min(1540px, 100%); height: auto; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 28px; }
 .accounts-head { text-align: center; }
@@ -276,16 +277,17 @@ body.post-content-active .topbar { backdrop-filter: none; background: rgba(8,11,
   border: 1px solid rgba(255,255,255,.18);
   border-radius: 8px;
   background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.018));
-  box-shadow: 0 16px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.1);
-  transform: translateZ(0);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
   contain: layout paint;
-  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+  content-visibility: auto;
+  contain-intrinsic-size: 250px 420px;
+  transition: border-color .2s ease, background .2s ease;
 }
 .account-preview:hover,
 .account-preview:focus-visible {
   border-color: rgba(255,226,147,.72);
   background: linear-gradient(145deg, rgba(241,199,91,.14), rgba(86,220,255,.055));
-  box-shadow: 0 30px 60px rgba(0,0,0,.42), 0 0 30px rgba(241,199,91,.16), inset 0 1px 0 rgba(255,255,255,.16);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 0 18px rgba(241,199,91,.1);
   outline: none;
   transform: none;
 }
@@ -296,7 +298,6 @@ body.post-content-active .topbar { backdrop-filter: none; background: rgba(8,11,
   min-width: 0;
   min-height: 0;
   object-fit: contain;
-  filter: drop-shadow(0 10px 14px rgba(0,0,0,.24));
 }
 .accounts-scroll-cue { display: flex; justify-content: center; gap: 42px; height: 58px; margin-top: 4px; opacity: .42; pointer-events: none; }
 .accounts-scroll-cue i { display: block; width: 42px; height: 58px; background: url("assets/scroll-hand.png") center / contain no-repeat; filter: invert(1); transform: translateY(-5px); animation: accounts-arrow-bob 1.9s ease-in-out infinite; }
