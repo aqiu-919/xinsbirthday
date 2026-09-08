@@ -20,6 +20,7 @@ const state = {
   transitioningJourney: false,
   progressFrame: 0,
   timelineMetrics: null,
+  postContentActive: false,
   lastProgressIndex: -1,
   lastProgressRatio: -1,
   dialogOpenTimer: 0,
@@ -276,11 +277,11 @@ function archiveDateParts(event) {
   const value = String(event["日期精度"] || event["年份"] || "").trim();
   const start = value.split(/\s*-\s*/)[0];
   const parsed = parseArchiveDateToken(start);
-  if (!parsed) return { year: Number(event["年份"]) || 0, month: 99, day: 99, precision: 0 };
+  if (!parsed) return { year: Number(event["年份"]) || 0, month: -1, day: -1, precision: 0 };
   return {
     year: parsed.year,
-    month: parsed.month ?? 99,
-    day: parsed.day ?? 99,
+    month: parsed.month ?? -1,
+    day: parsed.day ?? -1,
     precision: parsed.precision,
   };
 }
@@ -288,8 +289,9 @@ function archiveDateParts(event) {
 function compareArchiveEvents(a, b) {
   const dateA = archiveDateParts(a);
   const dateB = archiveDateParts(b);
-  return dateA.month - dateB.month
-    || dateA.day - dateB.day
+  return dateB.month - dateA.month
+    || dateB.day - dateA.day
+    || dateB.precision - dateA.precision
     || String(a["类别"]).localeCompare(String(b["类别"]), "zh-CN")
     || activityName(a).localeCompare(activityName(b), "zh-CN");
 }
@@ -343,7 +345,6 @@ function bindEvents() {
   }, { passive: false });
   window.addEventListener("scroll", scheduleProgressUpdate, { passive: true });
   journey.addEventListener("scroll", scheduleProgressUpdate, { passive: true });
-  postTimeline.addEventListener("scroll", scheduleProgressUpdate, { passive: true });
   el("beginBtn").addEventListener("click", beginJourney);
   el("beginBtn").addEventListener("pointerdown", () => {
     if (!state.audio && !state.audioPlayed) toggleSound();
@@ -553,6 +554,7 @@ function getTimelineMetrics() {
   const timeline = el("timeline");
   const viewportSize = desktop ? innerWidth : innerHeight;
   const start = desktop ? timeline.offsetLeft : timeline.offsetTop;
+  const postStart = desktop ? postTimeline.offsetLeft : postTimeline.offsetTop;
   const length = Math.max(1, desktop ? timeline.offsetWidth - innerWidth : timeline.offsetHeight - innerHeight);
   const travelerRatio = desktop ? .5 : .48;
   const lastNodeCenter = desktop
@@ -561,6 +563,7 @@ function getTimelineMetrics() {
   return {
     desktop,
     start,
+    postStart,
     length,
     viewportSize,
     journeyStart: start - viewportSize * (desktop ? .55 : .3),
@@ -570,13 +573,15 @@ function getTimelineMetrics() {
 
 function updateProgress() {
   const metrics = state.timelineMetrics || (state.timelineMetrics = getTimelineMetrics());
-  const { desktop, start, length, viewportSize, journeyStart, journeyEnd } = metrics;
+  const { desktop, start, postStart, length, viewportSize, journeyStart, journeyEnd } = metrics;
   const position = getJourneyPosition();
   const postContentActive = desktop
-    ? position >= postTimeline.offsetLeft - viewportSize * .5
+    ? position >= postStart - viewportSize * .5
     : postTimeline.getBoundingClientRect().top < viewportSize * .5;
-  const wasPostContentActive = document.body.classList.contains("post-content-active");
+  const wasPostContentActive = state.postContentActive;
   document.body.classList.toggle("post-content-active", postContentActive);
+  state.postContentActive = postContentActive;
+  if (!wasPostContentActive && postContentActive) document.dispatchEvent(new Event("stars-pause"));
   if (wasPostContentActive && !postContentActive) document.dispatchEvent(new Event("stars-resume"));
   const ratio = Math.max(0, Math.min(1, (position - start) / length));
   const index = Math.min(state.events.length - 1, Math.round(ratio * (state.events.length - 1)));
@@ -584,8 +589,12 @@ function updateProgress() {
     el("progressFill").style.transform = `scaleX(${ratio})`;
     state.lastProgressRatio = ratio;
   }
-  el("progressYear").textContent = state.events[index]?.["年份"] || "2007";
-  el("progressTrack").setAttribute("aria-valuenow", state.events[index]?.["年份"] || "2007");
+  if (index !== state.lastProgressIndex) {
+    const progressYear = state.events[index]?.["年份"] || "2007";
+    el("progressYear").textContent = progressYear;
+    el("progressTrack").setAttribute("aria-valuenow", progressYear);
+    state.lastProgressIndex = index;
+  }
   const year = Number(state.events[index]?.["年份"] || 2007);
   const era = ratio >= state.eraThreeStartRatio ? 3 : year >= 2016 ? 2 : 1;
   const previousEra = Number(traveler.dataset.era || era);
@@ -866,6 +875,15 @@ function initStars() {
   let stars = [];
   let streamDefs = [];
   let streamParticles = [];
+  let starFrame = 0;
+  const shouldAnimate = () => !document.hidden && !document.body.classList.contains("post-content-active");
+  const requestDraw = () => {
+    if (!starFrame && shouldAnimate()) starFrame = requestAnimationFrame(draw);
+  };
+  const cancelDraw = () => {
+    if (starFrame) cancelAnimationFrame(starFrame);
+    starFrame = 0;
+  };
   const curvePoint = (stream, t) => {
     const u = 1 - t;
     return {
@@ -979,10 +997,12 @@ function initStars() {
     });
   };
   const draw = (time = 0) => {
+    starFrame = 0;
+    if (!shouldAnimate()) return;
     const reduced = state.walking || document.body.classList.contains("timeline-active");
     const minFrameGap = reduced ? 50 : 33;
     if (lastStarDrawTime && time - lastStarDrawTime < minFrameGap) {
-      requestAnimationFrame(draw);
+      requestDraw();
       return;
     }
     lastStarDrawTime = time;
@@ -1053,15 +1073,20 @@ function initStars() {
         ctx.fill();
       }
     });
-    requestAnimationFrame(draw);
+    requestDraw();
   };
   resize();
-  draw();
-  document.addEventListener("stars-resume", () => requestAnimationFrame(draw), { passive: true });
+  requestDraw();
+  document.addEventListener("stars-pause", cancelDraw, { passive: true });
+  document.addEventListener("stars-resume", requestDraw, { passive: true });
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && !document.body.classList.contains("post-content-active")) requestAnimationFrame(draw);
+    if (document.hidden) cancelDraw();
+    else requestDraw();
   }, { passive: true });
-  window.addEventListener("resize", resize);
+  window.addEventListener("resize", () => {
+    resize();
+    requestDraw();
+  });
 }
 
 function escapeHtml(value = "") {
