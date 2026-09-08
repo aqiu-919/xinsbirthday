@@ -35,7 +35,7 @@ const traveler = el("traveler");
 const postTimeline = el("postTimeline");
 const accounts = el("accounts");
 const archive = el("archive");
-const categories = ["全部", "影视", "音乐", "舞台", "综艺", "杂志", "其他"];
+const categories = ["全部", "影视", "音乐", "舞台", "综艺", "直播", "杂志", "其他"];
 const WALK_SPEED = 58;
 
 function isDesktopLayout() {
@@ -257,15 +257,27 @@ function renderArchiveByYear(events) {
     }).join("");
 }
 
-function archiveDateParts(event) {
-  const value = String(event["日期精度"] || event["年份"] || "");
-  const match = value.match(/^(\d{4})(?:-(\d{1,2}))?(?:-(\d{1,2}))?$/);
-  if (!match) return { year: Number(event["年份"]) || 0, month: 99, day: 99, precision: 0 };
+function parseArchiveDateToken(value) {
+  const match = String(value || "").trim().match(/^(\d{4})(?:[/-](\d{1,2}))?(?:[/-](\d{1,2}))?$/);
+  if (!match) return null;
   return {
     year: Number(match[1]),
-    month: match[2] ? Number(match[2]) : 99,
-    day: match[3] ? Number(match[3]) : 99,
+    month: match[2] ? Number(match[2]) : null,
+    day: match[3] ? Number(match[3]) : null,
     precision: match[3] ? 3 : match[2] ? 2 : 1,
+  };
+}
+
+function archiveDateParts(event) {
+  const value = String(event["日期精度"] || event["年份"] || "").trim();
+  const start = value.split(/\s*-\s*/)[0];
+  const parsed = parseArchiveDateToken(start);
+  if (!parsed) return { year: Number(event["年份"]) || 0, month: 99, day: 99, precision: 0 };
+  return {
+    year: parsed.year,
+    month: parsed.month ?? 99,
+    day: parsed.day ?? 99,
+    precision: parsed.precision,
   };
 }
 
@@ -278,26 +290,39 @@ function compareArchiveEvents(a, b) {
     || String(a["活动/事件名称"]).localeCompare(String(b["活动/事件名称"]), "zh-CN");
 }
 
+function formatArchiveDateToken(value) {
+  const parsed = parseArchiveDateToken(value);
+  if (!parsed) return escapeHtml(String(value || ""));
+  if (parsed.precision === 3) return `${parsed.year}年${parsed.month}月${parsed.day}日`;
+  if (parsed.precision === 2) return `${parsed.year}年${parsed.month}月`;
+  return `${parsed.year}年`;
+}
+
 function formatArchiveDate(event) {
+  const value = String(event["日期精度"] || event["年份"] || "").trim();
+  if (!value) return "日期待核";
+  const parts = value.split(/\s*-\s*/).filter(Boolean);
+  if (parts.length > 1) return parts.map(formatArchiveDateToken).join("－");
   const date = archiveDateParts(event);
   if (date.precision === 3) return `${date.year}年${date.month}月${date.day}日`;
   if (date.precision === 2) return `${date.year}年${date.month}月`;
   if (date.precision === 1) return `${date.year}年（具体日期待核）`;
-  return escapeHtml(event["日期精度"] || event["年份"] || "日期待核");
+  return escapeHtml(value);
 }
 
 function renderArchiveEvent(event) {
   const title = escapeHtml(event["活动/事件名称"]);
+  const sourceUrl = String(event["来源URL"] || "").split(/\s+/).filter(Boolean)[0] || "";
   return `<article class="archive-row">
     <time class="archive-date" datetime="${escapeHtml(event["日期精度"] || event["年份"])}">${formatArchiveDate(event)}</time>
     <span class="archive-kind">${classify(event)}</span>
     <div class="archive-main"><h3>${title}</h3><p>${compactMeta(event)}</p></div>
-    ${event["来源URL"] ? `<a class="archive-link" href="${event["来源URL"]}" target="_blank" rel="noopener noreferrer" aria-label="查看${title}来源">↗</a>` : ""}
+    ${sourceUrl ? `<a class="archive-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer" aria-label="查看${title}来源">↗</a>` : ""}
   </article>`;
 }
 
 function compactMeta(event) {
-  return escapeHtml([event["身份"], event["地点"], event["平台/主办"]].filter(Boolean).join(" · "));
+  return escapeHtml([event["身份"], event["地点"], event["平台/主办"] || event["平台主办"]].filter(Boolean).join(" · "));
 }
 
 function renderYears() {
