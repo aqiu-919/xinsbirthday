@@ -1,6 +1,7 @@
 const state = {
   events: [],
   archiveEvents: [],
+  archiveYearRows: new Map(),
   currentFilter: "全部",
   visited: new Set(JSON.parse(localStorage.getItem("wangli-visited") || "[]")),
   audio: null,
@@ -232,6 +233,7 @@ function renderArchive() {
     const matchesQuery = !query || Object.values(event).join(" ").toLowerCase().includes(query);
     return matchesFilter && matchesQuery;
   });
+  state.archiveYearRows.clear();
   el("archiveGrid").innerHTML = state.currentFilter === "全部"
     ? renderArchiveByYear(visible)
     : [...visible]
@@ -252,12 +254,13 @@ function renderArchiveByYear(events) {
     .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
     .map(([year, yearEvents]) => {
       const sortedEvents = [...yearEvents].sort(compareArchiveEvents);
+      state.archiveYearRows.set(year, sortedEvents);
       return `<section class="archive-year-section" data-year="${year}">
         <header class="archive-year-heading">
           <button class="archive-year-button" type="button" aria-expanded="false" aria-controls="archive-year-${year}">${year}</button>
           <span>${yearEvents.length} 条记录</span>
         </header>
-        <div id="archive-year-${year}" class="archive-year-groups" hidden>${sortedEvents.map(renderArchiveEvent).join("")}</div>
+        <div id="archive-year-${year}" class="archive-year-groups" hidden></div>
       </section>`;
     }).join("");
 }
@@ -412,6 +415,11 @@ function toggleArchiveYear(event) {
   const groups = section?.querySelector(".archive-year-groups");
   if (!section || !groups) return;
   const willExpand = button.getAttribute("aria-expanded") !== "true";
+  if (willExpand && !groups.dataset.rendered) {
+    const yearEvents = state.archiveYearRows.get(section.dataset.year) || [];
+    groups.innerHTML = yearEvents.map(renderArchiveEvent).join("");
+    groups.dataset.rendered = "true";
+  }
   button.setAttribute("aria-expanded", String(willExpand));
   section.classList.toggle("expanded", willExpand);
   groups.hidden = !willExpand;
@@ -932,11 +940,11 @@ function initStars() {
         warm: .36,
       },
     ];
-    stars = Array.from({ length: Math.min(wide ? 145 : 90, Math.floor(area / (wide ? 9800 : 6200))) }, () => {
+    stars = Array.from({ length: Math.min(wide ? 145 : 54, Math.floor(area / (wide ? 9800 : 9400))) }, () => {
       const isLi = Math.random() < .055;
       return { x: Math.random() * innerWidth, y: Math.random() * innerHeight, r: Math.random() * 1.25 + .2, a: Math.random(), s: Math.random() * .008 + .002, isLi, size: Math.random() * 22 + 24, rotation: (Math.random() - .5) * .34 };
     });
-    streamParticles = Array.from({ length: Math.min(wide ? 250 : 150, Math.floor(area / (wide ? 5600 : 3900))) }, () => {
+    streamParticles = Array.from({ length: Math.min(wide ? 250 : 82, Math.floor(area / (wide ? 5600 : 7200))) }, () => {
       const streamIndex = Math.floor(Math.random() * streamDefs.length);
       const stream = streamDefs[streamIndex];
       return {
@@ -1000,7 +1008,8 @@ function initStars() {
     starFrame = 0;
     if (!shouldAnimate()) return;
     const reduced = state.walking || document.body.classList.contains("timeline-active");
-    const minFrameGap = reduced ? 50 : 33;
+    const mobile = innerWidth <= 760;
+    const minFrameGap = mobile ? (reduced ? 80 : 50) : (reduced ? 50 : 33);
     if (lastStarDrawTime && time - lastStarDrawTime < minFrameGap) {
       requestDraw();
       return;
